@@ -34,6 +34,7 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     implementation("com.ecommerce:shared-common:1.0.0-SNAPSHOT")
+    implementation("com.ecommerce:shared-security:1.0.0-SNAPSHOT")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
