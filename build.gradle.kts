@@ -31,6 +31,7 @@ extra["springCloudVersion"] = "2025.1.1"
 dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-gateway-server-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     implementation("com.ecommerce:shared-common:1.0.0-SNAPSHOT")
