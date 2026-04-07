@@ -1,4 +1,4 @@
-package com.ecommerce.apigateway.config;
+package com.app.apigateway.config;
 
 import java.util.Optional;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
