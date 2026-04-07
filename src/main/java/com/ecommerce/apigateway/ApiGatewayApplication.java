@@ -1,12 +1,19 @@
 package com.ecommerce.apigateway;
 
-import com.ecommerce.common.boot.EcomBootApplication;
+import com.common.boot.BaseSpringBootApplication;
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.SpringApplication;
+import reactor.core.publisher.Hooks;
 
-@EcomBootApplication
+@BaseSpringBootApplication
 public class ApiGatewayApplication {
 
-  static void main(String[] args) {
+  public static void main(String[] args) {
     SpringApplication.run(ApiGatewayApplication.class, args);
+  }
+
+  @PostConstruct
+  public void init() {
+    Hooks.enableAutomaticContextPropagation();
   }
 }

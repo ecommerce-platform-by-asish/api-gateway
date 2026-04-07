@@ -4,23 +4,42 @@ server:
 spring:
   application:
     name: api-gateway
+  main:
+    web-application-type: reactive
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
   cloud:
     gateway:
+      observability:
+        enabled: true
+
       server:
         webflux:
           routes:
+            - id: auth-service
+              uri: http://127.0.0.1:8080
+              predicates:
+                - Path=/api/auth/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 5
+                    redis-rate-limiter.burstCapacity: 10
+                    key-resolver: "#{@userKeyResolver}"
+
             - id: product-service
               uri: http://localhost:8081
               predicates:
                 - Path=/api/products/**
               filters:
-                - AuthenticationFilter
-            - id: auth-service
-              uri: http://localhost:8080
-              predicates:
-                - Path=/api/auth/**
+                - name: AuthenticationFilter
 
-jwt:
-  secret-key: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"
-  expiration-ms: 86400000
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/api/auth/.well-known/jwks.json
