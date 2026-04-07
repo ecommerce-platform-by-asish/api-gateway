@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: api-gateway
+  main:
+    web-application-type: reactive
 
   data:
     redis:
@@ -12,11 +14,14 @@ spring:
 
   cloud:
     gateway:
+      observability:
+        enabled: true
+
       server:
         webflux:
           routes:
             - id: auth-service
-              uri: http://localhost:8080
+              uri: http://127.0.0.1:8080
               predicates:
                 - Path=/api/auth/**
               filters:

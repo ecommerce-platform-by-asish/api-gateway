@@ -1,6 +1,5 @@
 package com.ecommerce.apigateway.config;
 
-import java.util.Objects;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,8 +18,8 @@ public class RateLimiterConfig {
   public KeyResolver userKeyResolver() {
     return exchange ->
         Mono.just(
-            Objects.requireNonNull(exchange.getRequest().getRemoteAddress())
-                .getAddress()
-                .getHostAddress());
+            java.util.Optional.ofNullable(exchange.getRequest().getRemoteAddress())
+                .map(addr -> addr.getAddress().getHostAddress())
+                .orElse("unknown"));
   }
 }
