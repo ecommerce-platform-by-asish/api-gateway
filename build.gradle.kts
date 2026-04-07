@@ -61,8 +61,7 @@ tasks.named("check") {
 }
 
 tasks.withType<JavaCompile> {
-    options.compilerArgs.add("-Xlint:all")
-    options.compilerArgs.add("-Xlint:-processing")
+    options.compilerArgs.addAll(listOf("-Xlint:all", "-Xlint:-serial", "-Xlint:-processing"))
 }
 
 val stopApp by tasks.registering(Exec::class) {
