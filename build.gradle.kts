@@ -33,8 +33,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
-    implementation("com.ecommerce:shared-common:1.0.0-SNAPSHOT")
-    implementation("com.ecommerce:shared-security:1.0.0-SNAPSHOT")
+    implementation("com.app:shared-common:1.0.0-SNAPSHOT")
+    implementation("com.app:shared-security:1.0.0-SNAPSHOT")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
@@ -57,4 +57,21 @@ tasks.withType<Test> {
 
 tasks.named("check") {
     dependsOn("spotlessCheck")
+}
+
+tasks.withType<JavaCompile> {
+    options.compilerArgs.addAll(listOf("-Xlint:all", "-Xlint:-serial", "-Xlint:-processing"))
+}
+
+val stopApp by tasks.registering(Exec::class) {
+    group = "application"
+    description = "Stops any running application processes for this service."
+    commandLine(
+        "sh",
+        "-c",
+        "ps aux | grep 'bootRun' | grep '${project.name}' | grep -v grep | awk '{print $2}' | xargs kill -9 || true")
+}
+
+tasks.named("bootRun") {
+    dependsOn(stopApp)
 }
