@@ -11,7 +11,7 @@ spotless {
     }
 }
 
-group = "com.common"
+group = "com.app"
 version = "0.0.1-SNAPSHOT"
 description = "API Gateway for Ecommerce App"
 
@@ -31,11 +31,10 @@ extra["springCloudVersion"] = "2025.1.1"
 dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-gateway-server-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
-    implementation("com.common:shared-common:1.0.0-SNAPSHOT")
-    implementation("com.common:shared-security:1.0.0-SNAPSHOT")
+    implementation("com.app:shared-common:1.0.0-SNAPSHOT")
+    implementation("com.app:shared-security:1.0.0-SNAPSHOT")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
@@ -66,10 +65,13 @@ tasks.withType<JavaCompile> {
 
 val stopApp by tasks.registering(Exec::class) {
     group = "application"
-    description = "Stops the running application processes."
-    commandLine("sh", "-c", "ps aux | grep 'bootRun' | grep '${project.name}' | grep -v grep | awk '{print $2}' | xargs kill -9 || true")
+    description = "Stops any running application processes for this service."
+    commandLine(
+        "sh",
+        "-c",
+        "ps aux | grep 'bootRun' | grep '${project.name}' | grep -v grep | awk '{print $2}' | xargs kill -9 || true")
 }
 
-tasks.named("build") {
+tasks.named("bootRun") {
     dependsOn(stopApp)
 }
