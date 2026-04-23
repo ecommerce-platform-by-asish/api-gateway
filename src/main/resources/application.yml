@@ -54,8 +54,30 @@ spring:
               filters:
                 - name: AuthenticationFilter
 
+            - id: openapi-auth
+              uri: http://localhost:8080
+              predicates:
+                - Path=/v3/api-docs/auth
+              filters:
+                - RewritePath=/v3/api-docs/auth, /api/auth/v3/api-docs
+
+            - id: openapi-product
+              uri: http://localhost:8081
+              predicates:
+                - Path=/v3/api-docs/product
+              filters:
+                - RewritePath=/v3/api-docs/product, /api/products/v3/api-docs
+
   security:
     oauth2:
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:8080/api/auth/.well-known/jwks.json
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: Auth Service API
+        url: /v3/api-docs/auth
+      - name: Product Service API
+        url: /v3/api-docs/product

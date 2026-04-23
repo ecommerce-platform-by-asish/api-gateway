@@ -35,6 +35,7 @@ dependencies {
 
     implementation("com.app:shared-common:1.0.0-SNAPSHOT")
     implementation("com.app:shared-security:1.0.0-SNAPSHOT")
+    implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:3.0.2")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
