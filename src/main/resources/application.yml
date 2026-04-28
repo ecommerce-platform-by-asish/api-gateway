@@ -4,80 +4,22 @@ server:
 spring:
   application:
     name: api-gateway
-  main:
-    web-application-type: reactive
-
-  reactor:
-    context-propagation: auto
-
+  docker:
+    compose:
+      enabled: true
+      lifecycle-management: start-only
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/auth/**
+        - id: product-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/products/**
   data:
     redis:
       host: localhost
-      port: 6379
-
-  cloud:
-    gateway:
-      server:
-        webflux:
-          observability:
-            enabled: true
-          globalcors:
-            cors-configurations:
-              '[/**]':
-                allowed-origins: "*"
-                allowed-methods:
-                  - GET
-                  - POST
-                  - PUT
-                  - DELETE
-                  - OPTIONS
-                allowed-headers: "*"
-          httpclient:
-            connect-timeout: 2000
-            response-timeout: 5s
-          routes:
-            - id: auth-service
-              uri: http://localhost:8081
-              predicates:
-                - Path=/api/auth/**
-              filters:
-                - name: RequestRateLimiter
-                  args:
-                    redis-rate-limiter.replenishRate: 5
-                    redis-rate-limiter.burstCapacity: 10
-                    key-resolver: "#{@userKeyResolver}"
-
-            - id: product-service
-              uri: http://localhost:8082
-              predicates:
-                - Path=/api/products/**
-              filters:
-                - name: GatewayAuthentication
-
-            - id: openapi-auth
-              uri: http://localhost:8081
-              predicates:
-                - Path=/v3/api-docs/auth
-              filters:
-                - RewritePath=/v3/api-docs/auth, /api/auth/v3/api-docs
-
-            - id: openapi-product
-              uri: http://localhost:8082
-              predicates:
-                - Path=/v3/api-docs/product
-              filters:
-                - RewritePath=/v3/api-docs/product, /api/products/v3/api-docs
-
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: http://localhost:8081/api/auth/.well-known/jwks.json
-
-springdoc:
-  swagger-ui:
-    urls:
-      - name: Auth Service API
-        url: /v3/api-docs/auth
-      - name: Product Service API
-        url: /v3/api-docs/product
+      port: 6380
