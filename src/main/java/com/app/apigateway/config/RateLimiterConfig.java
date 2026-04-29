@@ -17,10 +17,15 @@ public class RateLimiterConfig {
   @Bean
   @Primary
   public KeyResolver userKeyResolver() {
-    return exchange ->
-        Mono.just(
-            Optional.ofNullable(exchange.getRequest().getRemoteAddress())
-                .map(addr -> addr.getAddress().getHostAddress())
-                .orElse("unknown"));
+    return exchange -> {
+      String xForwardedFor = exchange.getRequest().getHeaders().getFirst("X-Forwarded-For");
+      if (xForwardedFor != null && !xForwardedFor.isBlank()) {
+        return Mono.just(xForwardedFor.split(",")[0].trim());
+      }
+      return Mono.just(
+          Optional.ofNullable(exchange.getRequest().getRemoteAddress())
+              .map(addr -> addr.getAddress().getHostAddress())
+              .orElse("unknown"));
+    };
   }
 }

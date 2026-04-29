@@ -25,6 +25,10 @@ spring:
                     redis-rate-limiter.replenishRate: 5
                     redis-rate-limiter.burstCapacity: 10
                     key-resolver: "#{@userKeyResolver}"
+                - name: CircuitBreaker
+                  args:
+                    name: authServiceCB
+                    fallbackUri: forward:/fallback
               metadata:
                 response-timeout: 2000
                 connect-timeout: 2000
@@ -39,6 +43,10 @@ spring:
                     redis-rate-limiter.replenishRate: 10
                     redis-rate-limiter.burstCapacity: 20
                     key-resolver: "#{@userKeyResolver}"
+                - name: CircuitBreaker
+                  args:
+                    name: productServiceCB
+                    fallbackUri: forward:/fallback
               metadata:
                 sensitiveHeaders: ""
   data:
