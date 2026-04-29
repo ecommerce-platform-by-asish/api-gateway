@@ -1,7 +1,9 @@
 plugins {
     java
+    idea
     alias(libs.plugins.springboot)
     alias(libs.plugins.spotless)
+    `jvm-test-suite`
 }
 
 group = "com.app"
@@ -31,6 +33,96 @@ dependencies {
     compileOnly(libs.lombok)
     annotationProcessor(platform(libs.sb.bom))
     annotationProcessor(libs.lombok)
+    annotationProcessor(libs.sb.configuration.processor)
+    
+    testImplementation(platform(libs.testcontainers.bom))
+    testImplementation(libs.sb.starter.test)
+    testImplementation(libs.bundles.testcontainers)
+    testImplementation(libs.jjwt.api)
+    testImplementation(libs.jjwt.impl)
+    testImplementation(libs.jjwt.jackson)
+    testRuntimeOnly(libs.junit.platform.launcher)
+}
+
+@Suppress("UnstableApiUsage")
+testing {
+    suites {
+        // 1. Standard Test Suite (Excludes Blackbox/Integration)
+        val test by getting(JvmTestSuite::class) {
+            useJUnitJupiter()
+            targets {
+                all {
+                    testTask.configure {
+                        exclude("**/blackbox/**")
+                        exclude("**/integration/**")
+                        filter.isFailOnNoMatchingTests = false
+                        failOnNoDiscoveredTests = false
+                    }
+                }
+            }
+        }
+
+        // 2. Integration Test Suite (Overlaps src/test/java)
+        register<JvmTestSuite>("integrationTest") {
+            useJUnitJupiter()
+            sources {
+                java.setSrcDirs(listOf("src/test/java"))
+                resources.setSrcDirs(listOf("src/test/resources"))
+            }
+            dependencies {
+                implementation(project())
+                implementation(libs.sb.starter.test)
+                libs.bundles.testcontainers.get().forEach { implementation(it) }
+                implementation("com.app:shared-common:1.0.0-SNAPSHOT")
+                implementation("com.app:shared-security:1.0.0-SNAPSHOT")
+                implementation(libs.sb.starter.webflux)
+            }
+            targets {
+                all {
+                    testTask.configure {
+                        include("**/integration/**")
+                        shouldRunAfter(test)
+                    }
+                }
+            }
+        }
+
+        // 3. Blackbox Test Suite (Overlaps src/test/java)
+        register<JvmTestSuite>("blackboxTest") {
+            useJUnitJupiter()
+            sources {
+                java.setSrcDirs(listOf("src/test/java"))
+                resources.setSrcDirs(listOf("src/test/resources"))
+            }
+            dependencies {
+                implementation(project())
+                implementation(libs.sb.starter.test)
+                libs.bundles.testcontainers.get().forEach { implementation(it) }
+                implementation(libs.jjwt.api)
+                implementation(libs.jjwt.impl)
+                implementation(libs.jjwt.jackson)
+                implementation("com.app:shared-common:1.0.0-SNAPSHOT")
+                implementation("com.app:shared-security:1.0.0-SNAPSHOT")
+                implementation(libs.sb.starter.webflux)
+            }
+            targets {
+                all {
+                    testTask.configure {
+                        include("**/blackbox/**")
+                        shouldRunAfter(testing.suites.named("integrationTest"))
+                        testLogging {
+                            events("passed", "skipped", "failed")
+                            showStandardStreams = true
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+tasks.named("check") {
+    dependsOn(testing.suites.named("integrationTest"), testing.suites.named("blackboxTest"))
 }
 
 tasks.withType<JavaCompile>().configureEach {
