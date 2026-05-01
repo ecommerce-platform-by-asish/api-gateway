@@ -20,18 +20,19 @@ spring:
           observability:
             enabled: true
           default-filters:
+            - PreserveHostHeader
             - GatewayAuthentication
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@userKeyResolver}"
           routes:
             - id: auth-service
               uri: http://localhost:8081
               predicates:
                 - Path=/api/auth/**
               filters:
-                - name: RequestRateLimiter
-                  args:
-                    redis-rate-limiter.replenishRate: 5
-                    redis-rate-limiter.burstCapacity: 10
-                    key-resolver: "#{@userKeyResolver}"
                 - name: CircuitBreaker
                   args:
                     name: authServiceCB
@@ -43,13 +44,8 @@ spring:
             - id: product-service
               uri: http://localhost:8082
               predicates:
-                - Path=/api/products/**
+                - Path=/api/products,/api/products/**
               filters:
-                - name: RequestRateLimiter
-                  args:
-                    redis-rate-limiter.replenishRate: 10
-                    redis-rate-limiter.burstCapacity: 20
-                    key-resolver: "#{@userKeyResolver}"
                 - name: CircuitBreaker
                   args:
                     name: productServiceCB
@@ -61,11 +57,6 @@ spring:
               predicates:
                 - Path=/api/cart/**
               filters:
-                - name: RequestRateLimiter
-                  args:
-                    redis-rate-limiter.replenishRate: 10
-                    redis-rate-limiter.burstCapacity: 20
-                    key-resolver: "#{@userKeyResolver}"
                 - name: CircuitBreaker
                   args:
                     name: cartServiceCB
