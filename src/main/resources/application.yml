@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: api-gateway
+  docker:
+    compose:
+      enabled: false
   threads:
     virtual:
       enabled: true
@@ -38,8 +41,8 @@ spring:
                     name: authServiceCB
                     fallbackUri: forward:/fallback
               metadata:
-                response-timeout: 2000
-                connect-timeout: 2000
+                response-timeout: 15000
+                connect-timeout: 15000
                 sensitiveHeaders: ""
             - id: product-service
               uri: http://localhost:8082
@@ -51,6 +54,8 @@ spring:
                     name: productServiceCB
                     fallbackUri: forward:/fallback
               metadata:
+                response-timeout: 15000
+                connect-timeout: 15000
                 sensitiveHeaders: ""
             - id: cart-service
               uri: http://localhost:8083
@@ -62,7 +67,37 @@ spring:
                     name: cartServiceCB
                     fallbackUri: forward:/fallback
               metadata:
+                response-timeout: 15000
+                connect-timeout: 15000
                 sensitiveHeaders: ""
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 20
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+    instances:
+      authServiceCB:
+        baseConfig: default
+      productServiceCB:
+        baseConfig: default
+      cartServiceCB:
+        baseConfig: default
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 15s
+    instances:
+      authServiceCB:
+        baseConfig: default
+      productServiceCB:
+        baseConfig: default
+      cartServiceCB:
+        baseConfig: default
 
 springdoc:
   api-docs:
