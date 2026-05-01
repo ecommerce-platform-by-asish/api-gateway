@@ -4,14 +4,21 @@ server:
 spring:
   application:
     name: api-gateway
-  docker:
-    compose:
+  threads:
+    virtual:
       enabled: true
-      lifecycle-management: start-only
+  data:
+    redis:
+      host: localhost
+      port: 6379
   cloud:
+    compatibility-verifier:
+      enabled: false
     gateway:
       server:
         webflux:
+          observability:
+            enabled: true
           default-filters:
             - GatewayAuthentication
           routes:
@@ -65,19 +72,6 @@ spring:
                     fallbackUri: forward:/fallback
               metadata:
                 sensitiveHeaders: ""
-  data:
-    redis:
-      host: localhost
-      port: 6379
-
-app:
-  security:
-    public-paths:
-      - "/api/products/**"
-    rsa:
-      generate: false
-    jwt:
-      jwk-set-uri: "http://localhost:8081/api/auth/.well-known/jwks.json"
 
 springdoc:
   api-docs:
@@ -93,3 +87,20 @@ springdoc:
         url: /api/products/v3/api-docs
       - name: Cart Service
         url: /api/cart/v3/api-docs
+
+app:
+  security:
+    jwt:
+      jwk-set-uri: "http://localhost:8081/api/auth/.well-known/jwks.json"
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: DEBUG
+    io.micrometer: DEBUG
+    com.app: DEBUG
+
+management:
+  endpoint:
+    gateway:
+      enabled: true

@@ -17,10 +17,8 @@ dependencies {
     implementation(platform(libs.sb.bom))
     implementation(platform(libs.sc.bom))
 
-    implementation(libs.bundles.observability)
     implementation(libs.bundles.reactive.gateway)
     implementation(libs.sb.starter.oauth2.resource.server)
-    
     implementation("com.app:shared-common:1.0.0-SNAPSHOT")
     implementation("com.app:shared-security:1.0.0-SNAPSHOT")
     

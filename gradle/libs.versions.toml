@@ -1,5 +1,5 @@
 [versions]
-springBoot = "4.0.6"
+springBoot = "4.1.0-RC1"
 springCloud = "2025.1.1"
 springCloudGateway = "5.0.1"
 springDoc = "3.0.3"
@@ -63,20 +63,22 @@ bouncycastle-bcprov = { module = "org.bouncycastle:bcprov-jdk18on", version.ref 
 jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
 jjwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
 jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
-
 micrometer-tracing-bridge-otel = { module = "io.micrometer:micrometer-tracing-bridge-otel", version = "" }
-otel-exporter-otlp = { group = "io.opentelemetry", name = "opentelemetry-exporter-otlp", version = "" }
+otel-sdk = { module = "io.opentelemetry:opentelemetry-sdk", version = "" }
+otel-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp", version = "" }
+
+
 
 [bundles]
 springweb = ["sb-starter-web", "sb-starter-validation"]
 databasejpa = ["sb-starter-data-jpa", "postgresql", "sb-starter-flyway", "flyway-database-postgresql"]
 lombok = ["lombok"]
 lombokmapstruct = ["lombok", "mapstruct", "mapstruct-processor"]
-tracing = ["micrometer-tracing-bridge-otel", "otel-exporter-otlp"]
 testbundle = ["sb-starter-test", "junit-platform-launcher"]
 testcontainers = ["testcontainers-core", "testcontainers-junit-jupiter", "wiremock-standalone", "sb-testcontainers"]
 security-jwt = ["jjwt-api", "jjwt-impl", "jjwt-jackson"]
-observability = ["sb-starter-actuator", "micrometer-tracing-bridge-otel", "otel-exporter-otlp"]
+tracing = ["micrometer-tracing-bridge-otel", "otel-sdk", "otel-exporter-otlp"]
+observability = ["sb-starter-actuator", "micrometer-tracing-bridge-otel", "otel-sdk", "otel-exporter-otlp"]
 reactive-gateway = ["sc-starter-gateway", "sb-starter-webflux", "sb-starter-data-redis-reactive"]
 persistence-pg = ["sb-starter-data-jpa", "postgresql", "sb-starter-flyway", "flyway-database-postgresql"]
 
