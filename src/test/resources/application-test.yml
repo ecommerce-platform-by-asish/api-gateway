@@ -25,7 +25,7 @@ spring:
                     redis-rate-limiter.burstCapacity: 20
                     key-resolver: "#{@userKeyResolver}"
           default-filters:
-            - GatewayAuthentication # Re-enable the security filter
+            - PreserveHostHeader
 app:
   security:
     public-paths: []

@@ -24,7 +24,6 @@ spring:
             enabled: true
           default-filters:
             - PreserveHostHeader
-            - GatewayAuthentication
             - name: RequestRateLimiter
               args:
                 redis-rate-limiter.replenishRate: 10
@@ -129,4 +128,8 @@ logging:
 management:
   endpoint:
     gateway:
-      enabled: true
+      access: unrestricted
+  endpoints:
+    web:
+      exposure:
+        include: "*"
